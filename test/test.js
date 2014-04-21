@@ -7,8 +7,10 @@ var url = require('url'),
     rimraf = require('rimraf'),
     mkdirp = require('mkdirp'),
     assert = require('assert'),
+    couchr = require('highland-couchr'),
     MultiCouch = require('multicouch'),
-    pool = require('../lib/index');
+    notify = require('../lib/index'),
+    _ = require('highland');
 
 
 /*****************
@@ -17,7 +19,7 @@ var url = require('url'),
 
 // configure test data directory and local couchdb port
 var DATA_DIR = path.resolve(__dirname, 'data');
-var COUCH_PORT = 8080;
+var COUCH_PORT = 8888;
 
 
 /********************
@@ -56,7 +58,10 @@ exports.before = function (done) {
         couch.on("error", function(error) {
             console.error("CouchDB errored '%s'.", error);
         });
-        couch.on("start", done);
+        couch.on("start", function () {
+            // give it time to become available
+            setTimeout(done, 1000);
+        });
         couch.start();
     });
 };
@@ -73,7 +78,38 @@ exports.after = function (done) {
  * Tests
  *********/
 
-exports['foo'] = function (done) {
-    assert(true, 'ok then');
-    done();
+exports['write changes from db_updates'] = function (done) {
+    var target = 'db_notify';
+    var failError = function (e) {
+        assert.ok(false, e.message);
+    };
+    var createDb = _.curry(function (client, name) {
+        return client.put(name, {});
+    });
+    var createDbs = function (dbs, client) {
+        return _(dbs)
+            .map(createDb(client)).series()
+            .stopOnError(failError)
+            .resume();
+    };
+    var dbChanges = function (client) {
+        var q = {include_doc: true, since: 0};
+        return client.changes(target, q).stopOnError(failError);
+    };
+    var notifier = notify.start({
+        url: couch_url,
+        target: target
+    });
+    notifier.on('start', function () {
+        var client = couchr(couch_url);
+        dbChanges(client).take(3).toArray(function (changes) {
+            test.same(changes, [
+                {id: 'foo'},
+                {id: 'bar'},
+                {id: 'baz'}
+            ]);
+            done();
+        });
+        createDbs(['foo', 'bar', 'baz'], client);
+    });
 };
