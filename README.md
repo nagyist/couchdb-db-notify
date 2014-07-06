@@ -1,3 +1,6 @@
+# CouchDB DB notify
+[![Build Status](https://travis-ci.org/hoodiehq/couchdb-db-notify.svg)](https://travis-ci.org/hoodiehq/couchdb-db-notify)
+
 This is a Node.js process which detects database changes and writes these
 updates to a single database in CouchDB in the form of documents. You can
 then subscribe to this changes feed to be notified of newly created, deleted

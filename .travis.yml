@@ -1,0 +1,13 @@
+language: node_js
+node_js:
+- '0.10'
+notifications:
+  email: false
+deploy:
+  provider: npm
+  email: stephan@boennemann.me
+  api_key:
+    secure: F3vCvnu0tcHDKsJp2Luq30WhWIb5kY+E84OwnIC9fLaoHn4alZPveITeoyBQq74E7tlYfLTafapGC5orlmjigd1SpYpsQ7BfnKRKAFa53FU7WoscpH5so6yZ1SAevfHl+ty1X4xjsNOlmkAnBXjTWZ0k6s2nG5fSzlqx8B/u8hw=
+  on:
+    tags: true
+    repo: hoodiehq/couchdb-db-notify
