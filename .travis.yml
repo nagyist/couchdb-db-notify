@@ -3,6 +3,8 @@ node_js:
 - '0.10'
 notifications:
   email: false
+  slack:
+    secure: i4oa1p/CH7kaeC3Pl9ORdBy4O/rZRpVTXnaJ1mnkvARbG4dt9DmiG81VkLpCpJL86u77WzUTu2E2QHWe2BJnLgYjmm58rLAAfmtUKfHZm5BsXwKOMqgVlH65hQneDXSusWjPkXoWDdjWawLOGrsVaigCbXAxszumUOPpF9JYZcY=
 before_install:
 - npm install -g grunt-cli
 deploy:
